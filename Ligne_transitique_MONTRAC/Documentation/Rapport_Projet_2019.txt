@@ -1,0 +1,36 @@
+Modifications du Projet TER 2016
+
+La structure :
+Le dossier Automate contient la structure d'un automate :
+  - un automate possède deux listes de modules (entrées et sorties)
+    - un module contient une liste d'actionneurs ou de capteurs ainsi que les topics qui leur sont associés
+      - un actionneur contient le bit où il faut ecrire et une fonction d'écriture WRITE(...)
+      - un capteur contient le bit à lire MASK(...)
+      - Ces deux dernières sont abstraites, leurs sous-classes possèdent les données à modifier.
+
+
+La commande :
+Le dossier commande contient les fichier main_commande.cpp permettent de créer les automates, de lire les capteurs et de 
+modifier les actionneurs. 
+Attention à la corrélation entre les numéros de module et des bit de lecture/écriture et la mémoire partagé de l'automate
+
+Par exemple, un capteur du module 1 de l'automate AP2, relié a la mémoire partagée (via unityPro) à l'adresse %MW1.6
+devra etre ajouter dans le code de la façon suivante : AP2.ajouter_capteur("nom_du_capteur", new Cpt_Position(1), 6, X);
+"X" étant une ébauche de l'adaptation avec le simulateur.
+
+
+ROS et communication :
+Il y à un noeud pour la commande et un noeud pour la communication (qui fait le lien entre la commande et la mémoire partagée de l'automate): :
+  - Chaque nom de topic entre la commmande et la communication possède le numéro d'API et de module correspondant
+  - La classe ModuleEntree souscrit à un topic pour ses capteurs que la communication publie 
+  - La classe ModuleSortie publie à un topic pour ses actionneurs que la communication souscrit
+
+La dossier communication contient les fonctions write_register(...) et read_register(...) permettant, respectivement, de
+  - lire dans le registre (valeurs des capteurs venant des automates)
+  - écrire dans le registre (commander/donner des ordres aux actionneurs aux automates)
+    - l'adresse du registre correspond au numero du module et le "NOMBRE_REGISTRE" est non identifié.
+
+  
+Attention, si modification des messages des topics : copier-coller les fichier *.h situés dans le dossier devel/commande
+
+Enfin les autres dossiers et fichiers n'ont pas était modifiés.
